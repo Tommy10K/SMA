@@ -1,0 +1,22 @@
+{
+    "topics": [
+        {
+            "name": "news",
+            "subscribers": [
+                "+40712345678",
+                "+40785910180"
+            ]
+        },
+        {
+            "name": "sports",
+            "subscribers": [
+                "+40798765432",
+                "+40785910180"
+            ]
+        },
+        {
+            "name": "weather",
+            "subscribers": []
+        }
+    ]
+}
