@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Vibrator</string>
+    <string name="vibrate_on">VIBRATE ON</string>
+    <string name="vibrate_off">VIBRATE OFF</string>
+</resources>
