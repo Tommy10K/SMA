@@ -1,0 +1,106 @@
+package com.example.morsecoach
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.morsecoach.ui.theme.MorseCoachTheme
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            MorseCoachTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppNavigation()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+    val auth = remember { FirebaseAuth.getInstance() }
+
+    var currentUser by remember { mutableStateOf<FirebaseUser?>(auth.currentUser) }
+
+    DisposableEffect(auth) {
+        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            currentUser = firebaseAuth.currentUser
+        }
+        auth.addAuthStateListener(listener)
+        onDispose {
+            auth.removeAuthStateListener(listener)
+        }
+    }
+
+    NavHost(navController = navController, startDestination = "home") {
+
+        composable("login") {
+            LoginScreen(
+                onLoginSuccess = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable("home") {
+            HomeScreen(
+                isLoggedIn = currentUser != null,
+                onLearnClick = {
+                    // TODO: Navigate to LevelSelectionScreen
+                },
+                onTranslateClick = {
+                    navController.navigate("translate")
+                },
+                onLoginClick = {
+                    navController.navigate("login")
+                },
+                onProfileClick = {
+                    navController.navigate("profile")
+                }
+            )
+        }
+
+        composable("profile") {
+            ProfileScreen(
+                onLogoutClick = {
+                    auth.signOut()
+                    navController.popBackStack()
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable("translate") {
+            TranslateScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+    }
+}
